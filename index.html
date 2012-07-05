@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0"/>
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css">
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script type="text/javascript" src="jquery.cookie.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+  <script type="text/javascript">
+function initialize_feeds(url, parent)
+{
+    var url_prefix = $.cookie("url_prefix");
+    var yql_query = "SELECT * FROM rss WHERE url = '%s'";
+    var yql_url = 'http://query.yahooapis.com/v1/public/yql?callback=?';
+    var container = $(parent);
+
+    jQuery.mobile.showPageLoadingMsg();
+
+    if(!url_prefix) url_prefix = "";
+    container.empty();
+
+    $.getJSON(yql_url, {
+        q: yql_query.replace(/%s/, url),
+        format: "json",
+    }, function(data) {
+        var container = $(parent);
+        container.empty();
+        for(var i in data.query.results.item) {
+            var item = data.query.results.item[i];
+            var li = jQuery("<li>");
+            var a = jQuery("<a>");
+	    a.text(item.title);
+            a.attr("href", url_prefix + item.link).attr("target", "_blank");
+            li.append(a);
+            container.append(li);
+        }
+	jQuery.mobile.changePage(jQuery('#news'));
+        container.listview("refresh");
+	jQuery.mobile.hidePageLoadingMsg();
+    });
+	return false;
+}
+
+function get_feeds(elem, parent)
+{
+    var e = $(elem)
+    var board = e.attr("data-2nni-board");
+    $("#news-title").text(e.text());
+
+    if(board == null || typeof(board) == "undefined")
+        return initialize_feeds('http://www.2nn.jp/rss/index.rdf', parent);
+    url = "http://www.2nn.jp/rss/" + board + ".rdf";
+    return initialize_feeds(url, parent);
+}  
+
+function load_cookie()
+{
+    var url = $.cookie("url_prefix");
+    if(!url) url = "";
+
+    $("#url_prefix", "#config").val(url);
+}
+
+function save_cookie()
+{
+    var t = $("#url_prefix", "#config");
+    var url = t[0].value;
+
+    $.cookie("url_prefix", url, { expires: 365 }); 
+}
+
+$('#config').live('pagebeforeshow', function(ev, ui) {
+    load_cookie();
+});
+  </script>
+</head>
+<body>
+  <div id="home" data-role="page">
+
+    <div data-role="header">
+      <h1>2NNi</h1>
+      <a href="#config" data-icon="gear" data-rel="dialog" class="ui-btn-right">設定</a>
+    </div><!-- /header -->
+    
+    <div data-role="content">
+      <ul data-role="listview">
+	<li><a href="#news" data-ajax="false" onclick="return get_feeds(this, '#news-items');">2NN トップページ</a></li>
+	<li><a href="#news" data-ajax="false" data-2nni-board="newsplus" onclick="return get_feeds(this, '#news-items');">ニュース速報+</a></li>
+	<li><a href="#news" data-ajax="false" data-2nni-board="mnewsplus" onclick="return get_feeds(this, '#news-items');">芸能・スポーツニュース速報+</a></li>
+	<li><a href="#news" data-ajax="false" data-2nni-board="news4plus" onclick="return get_feeds(this, '#news-items');">東アジアニュース速報+</a></li>
+	<li><a href="#news" data-ajax="false" data-2nni-board="bizplus" onclick="return get_feeds(this, '#news-items');">ビジネスニュース+</a></li>
+	<li><a href="#news" data-ajax="false" data-2nni-board="news5plus" onclick="return get_feeds(this, '#news-items');">国際ニュース速報+</a></li>
+	<li><a href="#news" data-ajax="false" data-2nni-board="scienceplus" onclick="return get_feeds(this, '#news-items');">科学ニュース+</a></li>
+	<li><a href="#news" data-ajax="false" data-2nni-board="femnewsplus" onclick="return get_feeds(this, '#news-items');">ほのぼのニュース+</a></li>
+	<li><a href="#news" data-ajax="false" data-2nni-board="moeplus" onclick="return get_feeds(this, '#news-items');">萌えニュース+</a></li>
+	<li><a href="#news" data-ajax="false" data-2nni-board="dqnplus" onclick="return get_feeds(this, '#news-items');">痛いニュース+</a></li>
+	<li><a href="#news" data-ajax="false" data-2nni-board="owabiplus" onclick="return get_feeds(this, '#news-items');">お詫び+</a></li>      
+      </ul>
+    </div><!-- /content -->
+
+    <div data-role="footer" class="ui-bar">
+      <a href="#help" data-role="button" data-icon="arrow-r">ヘルプ</a>
+      <a href="http://www.2nn.jp/" target="_self" data-role="button" data-icon="arrow-r">2NN へ</a>
+    </div><!-- /footer -->
+  </div><!-- /page -->
+
+  <div id="news" data-role="page">
+    <div data-role="header">
+      <a href="#home" data-icon="home" data-direction="reverse" class="ui-btn-left jqm-home">ホーム</a>
+      <h1 id="news-title"></h1>
+      <a href="#config" data-icon="gear" data-rel="dialog" class="ui-btn-right">設定</a>
+    </div><!-- /header -->
+
+    <div data-role="content">
+      <ul id="news-items" data-role="listview">
+      </ul>
+    </div>
+  </div>
+
+  <div id="help" data-role="page">
+    <div data-role="header">
+      <a href="#home" data-icon="home" data-direction="reverse" class="ui-btn-left jqm-home">ホーム</a>
+      <h1>ヘルプ</h1>
+      <a href="#config" data-icon="gear" data-rel="dialog" class="ui-btn-right">設定</a>
+    </div><!-- /header -->
+
+    <div data-role="content">
+      <h3>このサイトについて</h3>
+      <p><a target="_blank" href="http://www.2nn.jp/">2NN</a> から RSS を取得して、iPhone などで見やすいように表示します。また、リンク先に p2 などの専用ブラウザを設定できるようにします。</p>
+      
+      <p>リンク先設定はユーザの Cookie に保存されるため、サーバには何の情報も保存されません。Cookie の有効期限は 1 年です。</p>
+
+      <h3>「設定」ボタン</h3>
+      <p>リンクを選んだときに、それを開くための URL を設定します。ここで設定した文字列の後に、スレの URL を連結したものがリンク先になります。</p>
+      <p>自鯖で <a target="_blank" href="http://akid.s17.xrea.com/">p2</a> をお持ちの方は、read.php への URL を設定することでrep2iPhone へのダイレクトリンクが出来るようになります。というかそのために作った。</p>
+      <p>Android ならインテントの URL を書くことで、専用ブラウザソフトへのダイレクトリンクが出来るようになるでしょう。対応アプリがあればの話ですが。</p>
+      <p>自鯖 p2 へ飛ばすには、<code>http://ホスト名/p2へのパス/read.php?b=i&amp;url=</code> と指定してください。</p>
+    </div>
+  </div>
+
+  <div id="config" data-role="page" title="設定">
+    <div data-role="header">
+      <h1>専ブラの設定</h1>
+    </div><!-- /header -->
+
+    <div data-role="content">
+      <label>URL:</label>
+      <input type="text" id="url_prefix" name="url_prefix" value=""/>
+      <p>この値にスレの URL が追加されます。値が空だと直接開きます。設定は Cookie に保存されます。</p>
+      <a data-role="button" onclick="save_cookie();$('.ui-dialog').dialog('close');">保存</a>
+    </div>
+  </div>
+
+</body>
+</html>
