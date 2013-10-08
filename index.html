@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0"/>
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.css">
-  <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0-beta.1/jquery.mobile-1.4.0-beta.1.min.css"/>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
   <script type="text/javascript" src="jquery.cookie.js"></script>
-  <script type="text/javascript" src="http://code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.min.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/mobile/1.4.0-beta.1/jquery.mobile-1.4.0-beta.1.min.js"></script>
   <script type="text/javascript">
-
 function initialize_feeds(url, parent)
 {
     var url_prefix = $.cookie("url_prefix");
@@ -16,7 +15,7 @@ function initialize_feeds(url, parent)
     var yql_url = 'http://query.yahooapis.com/v1/public/yql?callback=?';
     var $container = $(parent);
 
-    jQuery.mobile.showPageLoadingMsg();
+    jQuery.mobile.loading("show");
 
     if(!url_prefix) url_prefix = "";
     $container.empty();
@@ -36,7 +35,7 @@ function initialize_feeds(url, parent)
         }
 	jQuery.mobile.changePage($('#news'));
         $container.listview("refresh");
-	jQuery.mobile.hidePageLoadingMsg();
+	jQuery.mobile.loading("hide");
     });
     return false;
 }
@@ -71,7 +70,6 @@ $(document).on("pageinit", "#home", function() {
 </head>
 <body>
   <div id="home" data-role="page">
-
     <div data-role="header">
       <h1>2NNi</h1>
       <a href="#config" data-icon="gear" data-rel="dialog" class="ui-btn-right">設定</a>
